@@ -31,7 +31,7 @@ jobs:
           ZIP_PASSWORD: ${{ secrets.FFE_DATABASE_ZIP_PASSWORD }}
         run: |
           DB_FILENAME=$(python -c "from generate_ffe_sqlite import DB_FILENAME; print(DB_FILENAME)")
-          zip -P "ZIP_PASSWORD" "${DB_FILENAME%.db}.zip" "$DB_FILENAME"
+          zip -P "$ZIP_PASSWORD" "${DB_FILENAME%.db}.zip" "$DB_FILENAME"
 
       - name: Publish to GitHub Release
         env:
