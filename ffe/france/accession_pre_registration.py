@@ -25,7 +25,7 @@ from pyodbc import Cursor
 import csv
 
 DOWNLOAD_DIR: Path = Path(__file__).parent / 'download'
-CSV_DIR: Path = Path(__file__).parent / 'csv'
+CSV_DIR: Path = Path(__file__).parent / 'output'
 
 def download_file(
     url: str,
@@ -308,7 +308,7 @@ class PreRegistration:
                 print(f'{player['comment']}: [{up_to_date_player['last_name']} {up_to_date_player['first_name']} {up_to_date_player['rating']}{up_to_date_player['rating_type']} {up_to_date_player['ffe_category']}{up_to_date_player['gender']}] not pre-registered (licence type: {up_to_date_player['ffe_licence_type']}).')
             else:
                 print(f'{player['comment']}: [{player['last_name']} {player['first_name']} {player['rating']}{player['rating_type']} {player['ffe_category']}{player['gender']}] not found in the database.')
-        with open(csv_file, mode='w', newline='') as f:
+        with open(csv_file, mode='w', newline='', encoding='utf-8') as f:
             writer = csv.DictWriter(f, fieldnames=list(players[0].keys()))
             writer.writeheader()
             writer.writerows(players)
@@ -336,7 +336,7 @@ class Over2200Before:
             print(f'Retrieving players over 2200 for {calendar.month_name[period.month]} {period.year}...')
             players: dict[int, dict[str, Any]] = ffe_database.get_players(elo_min=2200)
             for ffe_id, player in players.items():
-                player['comment'] = f'Joueur·euse classé·e {player['rating']} en {calendar.month_name[period.month]} {period.year}'
+                player['comment'] = f'Classé{'e' if player['gender'] == 'W' else ''} {player['rating']} en {calendar.month_name[period.month]} {period.year}'
                 if pre_registration.add_player(player):
                     count += 1
             print(f'{count} added, {len(players) - count} skipped.')
@@ -364,7 +364,7 @@ class Women19502199BeforeOrNow:
             count: int = 0
             women = ffe_database.get_players(elo_min=elo_min, elo_max=elo_max, women_only=True)
             for ffe_id, woman in women.items():
-                woman['comment'] = f'Joueuse classée {woman['rating']} en {calendar.month_name[period.month]} {period.year}'
+                woman['comment'] = f'Classée {woman['rating']} en {calendar.month_name[period.month]} {period.year}'
                 if pre_registration.add_player(woman):
                     count += 1
             print(f'{count} added, {len(women) - count} skipped.')
@@ -485,7 +485,7 @@ WHERE
         count : int = 0
         for place, player_name in enumerate(ranked_player_names[:places], start=1):
             player: dict[str, Any] = players_by_name[player_name]
-            player['comment'] = f'[{self.name}] {place}e place'
+            player['comment'] = f'{self.name} {place}e place'
             if pre_registration.add_player(player):
                 count += 1
         print(f'{count} added, {places - count} skipped.')
@@ -500,10 +500,10 @@ def main():
     over_2200_now: Over2200Now = Over2200Now()
     pre_registration: PreRegistration = PreRegistration(over_2200_now)
     for tournament in (
-            Tournament(67714, 'France 2025 Accession', percent=50),
-            Tournament(67717, 'France 2025 Open A', places=10),
-            Tournament(67718, 'France 2025 Open B', places=1),
-            Tournament(71008, 'France jeunes 2026 U18M', places=1),
+            Tournament(67714, 'Accession 2025', percent=50),
+            Tournament(67717, 'Open A 2025', places=10),
+            Tournament(67718, 'Open B 2025', places=1),
+            Tournament(71008, 'FJ U18M 2026', places=1),
     ):
         tournament.pre_registrate_players(pre_registration)
     Over2200Before(periods).pre_registrate_players(pre_registration)
