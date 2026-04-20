@@ -22,7 +22,7 @@ from urllib.parse import urlsplit
 
 import requests
 
-from aes_cbc import AesCbc
+from aes_ecb import AesEcb
 
 PAPI_CONVERTER_VERSION = '1.4.0'
 FFE_DATABASE_URL = 'https://www.echecs.asso.fr/Papi/PapiData.zip'
@@ -357,7 +357,7 @@ def main():
     size_mb = output_file.stat().st_size / 1_048_576
     print(f'Output: {args.output} ({size_mb:.1f} MB)')
 
-    AesCbc.encrypt_file(output_file, Path(ENC_DB_FILENAME), key)
+    AesEcb.encrypt_file(output_file, Path(ENC_DB_FILENAME), key)
 
 
 if __name__ == '__main__':

@@ -15,7 +15,7 @@ from xml.etree import ElementTree
 
 import requests
 
-from aes_cbc import AesCbc
+from aes_ecb import AesEcb
 from progress import Progress
 
 FIDE_DATABASE_URL = 'https://ratings.fide.com/download/players_list_xml_legacy.zip'
@@ -216,7 +216,7 @@ def main():
         xml_path = download_fide_xml(tmp)
         sqlite_file: Path = tmp / DB_FILENAME
         convert_xml_to_sqlite(xml_path, sqlite_file)
-        AesCbc.encrypt_file(sqlite_file, output_file, key)
+        AesEcb.encrypt_file(sqlite_file, output_file, key)
 
     print(f'FIDE SQLite database encrypted to {output_file}.')
 
