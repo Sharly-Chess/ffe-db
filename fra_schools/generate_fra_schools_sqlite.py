@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Standalone script: download the FRA schools database (), convert it to SQLite.
+Standalone script: download the FRA schools data (JSON format), convert it to SQLite.
 Does not depend on the full Sharly Chess app environment — only requires `requests`.
 """
 
@@ -47,7 +47,7 @@ class FraSchoolsSqliteGenerator(SqliteGenerator):
     def generate_sqlite_database(
         cls,
         tmp_dir: Path,
-    ):
+    ) -> Path:
         json_path: Path = cls.download_json_file(tmp_dir)
         return cls.convert_json_to_sqlite(json_path)
 
