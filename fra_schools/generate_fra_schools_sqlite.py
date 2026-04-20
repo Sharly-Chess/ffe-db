@@ -16,8 +16,6 @@ from urllib.parse import urlsplit
 import requests
 from requests import HTTPError
 
-from sqlite_generator import SqliteGenerator
-
 sys.path.extend(
     map(
         str,
@@ -28,6 +26,7 @@ sys.path.extend(
 )
 
 from progress import Progress
+from sqlite_generator import SqliteGenerator
 
 
 # Increment when the schema changes so consumers can detect the format version.
