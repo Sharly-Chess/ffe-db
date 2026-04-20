@@ -1,0 +1,43 @@
+name: FRA Schools Database Update
+
+on:
+  schedule:
+    - cron: '0 5 * * 0'  # Every Sunday at 5:00am
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-fra-schools-database:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Python
+        uses: actions/setup-python@v5.5.0
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+          pip install cryptography
+
+      - name: Generate FRA Schools SQLite database
+        env:
+          ENC_PASSWORD: ${{ secrets.FRA_SCHOOLS_DATABASE_ENC_PASSWORD }}
+        run: python fra_schools/generate_fra_schools_sqlite.py --key="$ENC_PASSWORD"
+
+      - name: Publish to GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ENC_DB_FILENAME=$(python -c "from fra_schools.generate_fra_schools_sqlite import ENC_DB_FILENAME; print(ENC_DB_FILENAME)")
+          TAG="fra_schools-latest"
+          gh release delete "$TAG" --yes --cleanup-tag 2>/dev/null || true
+          gh release create "$TAG" "$ZIP_FILENAME" "$ENC_DB_FILENAME" \
+            --title "FRA Schools Database" \
+            --notes "Auto-updated daily" \
+            --latest=false
